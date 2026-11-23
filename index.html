@@ -6930,5 +6930,194 @@ window.addEventListener("DOMContentLoaded", () => {
   renderMath();
 });
 </script>
+<!-- BỘ GIÁM SÁT TOÀN MÀN HÌNH & CHỐNG GIAN LẬN CHO HỌC SINH -->
+<div id="exam-lock-overlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[9999] hidden items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl border-2 border-amber-400">
+    <div id="lock-icon" class="w-16 h-16 mx-auto rounded-full bg-blue-100 text-blue-900 flex items-center justify-center text-3xl font-extrabold">
+      &#128274;
+    </div>
+    <h3 id="lock-title" class="text-xl font-extrabold text-blue-950">
+      Chế độ làm bài Toàn màn hình
+    </h3>
+    <p id="lock-desc" class="text-sm text-slate-600 leading-relaxed">
+      Để đảm bảo tính nghiêm túc, bài làm yêu cầu mở <strong>Toàn màn hình</strong>. Hệ thống sẽ khóa chuột phải, phím F12 và ghi nhận cảnh báo nếu thoát màn hình hoặc chuyển sang cửa sổ khác (tối đa 3 lần).
+    </p>
+    <div id="lock-violation-badge" class="hidden bg-rose-100 border border-rose-300 text-rose-900 text-xs font-extrabold px-3 py-2 rounded-lg">
+      Cảnh báo vi phạm lần 1 / 3!
+    </div>
+    <button id="btn-enter-exam-fs" type="button" onclick="activateExamFullscreen()"
+      class="w-full bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-sm py-3 px-5 rounded-xl shadow-lg transition cursor-pointer">
+      &#9974; Bắt đầu làm bài (Toàn màn hình)
+    </button>
+  </div>
+</div>
+
+<script>
+(function initStrictExamGuard() {
+  let violationCount = 0;
+  const MAX_VIOLATIONS = 3;
+  let examStarted = false;
+  let lastViolationTime = 0;
+  let autoSubmittedDone = false;
+
+  function isStudentExamActive() {
+    const assignPanel = document.getElementById("panel-assignment");
+    const isAssignVisible = assignPanel && !assignPanel.classList.contains("hidden");
+    const isSubmitted = typeof examSubmittedByStudent !== "undefined" && examSubmittedByStudent;
+    return typeof isStudentMode !== "undefined" && isStudentMode && isAssignVisible && !isSubmitted && !autoSubmittedDone;
+  }
+
+  function showLockOverlay(isWarning) {
+    const overlay = document.getElementById("exam-lock-overlay");
+    const area = document.getElementById("exam-questions-area");
+    if (!overlay) return;
+
+    if (area) area.classList.add("exam-blur-active");
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+
+    if (isWarning) {
+      document.getElementById("lock-icon").innerHTML = "&#9888;";
+      document.getElementById("lock-icon").className = "w-16 h-16 mx-auto rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-3xl font-extrabold";
+      document.getElementById("lock-title").textContent = "CẢNH BÁO THOÁT MÀN HÌNH LÀM BÀI!";
+      document.getElementById("lock-desc").innerHTML = "Bạn vừa thoát khỏi chế độ toàn màn hình hoặc chuyển sang cửa sổ khác. Vui lòng quay lại toàn màn hình ngay để tiếp tục làm bài.";
+      const vBadge = document.getElementById("lock-violation-badge");
+      vBadge.classList.remove("hidden");
+      vBadge.textContent = `Cảnh báo vi phạm lần ${violationCount} / ${MAX_VIOLATIONS}! (Đạt 3 lần hệ thống sẽ tự động nộp bài)`;
+      document.getElementById("btn-enter-exam-fs").innerHTML = "&#9974; Quay lại Toàn màn hình để làm tiếp";
+    }
+  }
+
+  function hideLockOverlay() {
+    const overlay = document.getElementById("exam-lock-overlay");
+    const area = document.getElementById("exam-questions-area");
+    if (overlay) {
+      overlay.classList.add("hidden");
+      overlay.classList.remove("flex");
+    }
+    if (area) area.classList.remove("exam-blur-active");
+  }
+
+  function triggerAutoSubmit() {
+    if (autoSubmittedDone) return;
+    autoSubmittedDone = true;
+    examStarted = false;
+    hideLockOverlay();
+
+    try {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        const exitFs = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exitFs) exitFs.call(document).catch(() => {});
+      }
+    } catch (_) {}
+
+    if (typeof submitAndGradeExam === "function") {
+      submitAndGradeExam();
+    } else {
+      if (typeof examSubmittedByStudent !== "undefined") examSubmittedByStudent = true;
+      const resBox = document.getElementById("exam-grading-result");
+      if (resBox) {
+        resBox.classList.remove("hidden");
+        resBox.innerHTML = `<div class="font-extrabold text-rose-900 text-base">BÀI LÀM ĐÃ ĐƯỢC TỰ ĐỘNG NỘP DO THOÁT MÀN HÌNH ${MAX_VIOLATIONS} LẦN!</div>`;
+      }
+    }
+
+    setTimeout(() => {
+      alert("Bạn đã thoát màn hình quá " + MAX_VIOLATIONS + " lần. Hệ thống đã tự động nộp bài!");
+    }, 120);
+  }
+
+  function registerViolation() {
+    if (!isStudentExamActive() || !examStarted || autoSubmittedDone) return;
+    const now = Date.now();
+    // Tránh 1 lần bấm Esc kích hoạt đồng thời cả fullscreenchange và visibilitychange/blur trong vòng 600ms
+    if (now - lastViolationTime < 600) return;
+    lastViolationTime = now;
+
+    violationCount++;
+    if (violationCount >= MAX_VIOLATIONS) {
+      triggerAutoSubmit();
+      return;
+    }
+    showLockOverlay(true);
+  }
+
+  window.activateExamFullscreen = function() {
+    if (autoSubmittedDone) {
+      hideLockOverlay();
+      return;
+    }
+    const docEl = document.documentElement;
+    const reqFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+    examStarted = true;
+    hideLockOverlay();
+    if (reqFs) {
+      try {
+        const p = reqFs.call(docEl);
+        if (p && typeof p.catch === "function") {
+          p.catch(() => {});
+        }
+      } catch (_) {}
+    }
+  };
+
+  document.addEventListener("contextmenu", function(e) {
+    if (isStudentExamActive()) {
+      e.preventDefault();
+    }
+  });
+
+  document.addEventListener("keydown", function(e) {
+    if (!isStudentExamActive()) return;
+    const key = (e.key || "").toUpperCase();
+    const isDevShortcut =
+      key === "F12" ||
+      (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(key)) ||
+      (e.metaKey && e.altKey && ["I", "J", "C"].includes(key)) ||
+      ((e.ctrlKey || e.metaKey) && ["U", "S", "P"].includes(key));
+
+    if (isDevShortcut) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, true);
+
+  function onFullscreenChange() {
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    if (!fsEl && isStudentExamActive() && examStarted) {
+      registerViolation();
+    }
+  }
+  document.addEventListener("fullscreenchange", onFullscreenChange);
+  document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+
+  document.addEventListener("visibilitychange", function() {
+    if (document.hidden && isStudentExamActive() && examStarted) {
+      registerViolation();
+    }
+  });
+
+  setInterval(function() {
+    const area = document.getElementById("exam-questions-area");
+    if (autoSubmittedDone) {
+      hideLockOverlay();
+      return;
+    }
+    if (area && isStudentExamActive()) {
+      area.classList.add("exam-protected-area");
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!examStarted && !fsEl) {
+        showLockOverlay(false);
+      }
+    } else if (!isStudentExamActive()) {
+      examStarted = false;
+      violationCount = 0;
+      autoSubmittedDone = false;
+      hideLockOverlay();
+    }
+  }, 600);
+})();
+</script>
 </body>
 </html>
