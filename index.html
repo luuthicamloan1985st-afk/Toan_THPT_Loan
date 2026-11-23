@@ -81,6 +81,73 @@
       .print-full { width: 100% !important; max-width: 100% !important; box-shadow: none !important; border: none !important; }
     }
     .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    @keyframes slideFadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .slide-anim-enter {
+      animation: slideFadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .slide-stage-surface {
+      background:
+        radial-gradient(circle at 12% 15%, rgba(245, 158, 11, 0.14), transparent 36%),
+        radial-gradient(circle at 88% 82%, rgba(56, 189, 248, 0.14), transparent 40%),
+        linear-gradient(145deg, #09132c 0%, #0f1f47 52%, #132554 100%);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 20px 45px -12px rgba(2, 6, 23, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .slide-math-card {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .exam-protected-area {
+      position: relative;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    .exam-protected-area.exam-blur-active {
+      filter: blur(14px) contrast(0.75) !important;
+      transition: filter 0.12s ease;
+    }
+    .anti-photo-grid-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+      overflow: hidden;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(15, 23, 42, 0.032) 0px, rgba(15, 23, 42, 0.032) 1px, transparent 1px, transparent 4px),
+        repeating-linear-gradient(90deg, rgba(30, 58, 138, 0.028) 0px, rgba(30, 58, 138, 0.028) 1px, transparent 1px, transparent 5px),
+        repeating-linear-gradient(-32deg, rgba(225, 29, 72, 0.045) 0px, rgba(225, 29, 72, 0.045) 1px, transparent 1px, transparent 28px);
+    }
+    .anti-photo-grid-layer::before {
+      content: "CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT · CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT · CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT · CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT · CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT · CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT · CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT · CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT · CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT · CHỐNG CHỤP MÀN HÌNH · BÀI THI TOÁN THPT";
+      position: absolute;
+      inset: -40%;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: space-around;
+      justify-content: space-around;
+      gap: 34px 48px;
+      transform: rotate(-24deg);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: rgba(15, 23, 42, 0.065);
+      white-space: normal;
+      line-height: 2.6;
+      text-align: center;
+    }
+    @media print {
+      .exam-protected-area {
+        filter: blur(16px) !important;
+      }
+    }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
   </style>
 </head>
@@ -316,18 +383,22 @@
           </button>
         </div>
 
-        <div id="slide-deck-view" class="bg-slate-900 text-white rounded-2xl p-6 md:p-10 shadow-lg min-h-[460px] flex flex-col justify-between relative">
-          <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-            <div class="flex items-center gap-2">
-              <span id="slide-counter" class="bg-slate-800 px-3 py-1 rounded-full font-bold text-amber-400">Slide 1 / 12</span>
-              <span id="slide-deck-badge" class="bg-blue-900/80 text-blue-200 px-2.5 py-1 rounded-full font-semibold">Bộ trình chiếu chuẩn SGK</span>
+        <div id="slide-deck-view" class="slide-stage-surface text-white rounded-2xl p-5 md:p-8 min-h-[480px] flex flex-col justify-between relative overflow-hidden">
+          <div class="w-full h-1.5 bg-slate-800/90 rounded-full overflow-hidden mb-4">
+            <div id="slide-progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-amber-300 to-sky-400 transition-all duration-300" style="width: 8%;"></div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="slide-counter" class="bg-amber-400 text-slate-950 px-3 py-1 rounded-full font-extrabold shadow-xs">Slide 1 / 12</span>
+              <span id="slide-deck-badge" class="bg-sky-500/15 border border-sky-400/30 text-sky-200 px-3 py-1 rounded-full font-semibold">Bộ trình chiếu chuẩn SGK</span>
             </div>
-            <div class="flex items-center gap-3">
-              <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-200">
+            <div class="flex flex-wrap items-center gap-3">
+              <label class="inline-flex items-center gap-1.5 cursor-pointer bg-slate-900/60 hover:bg-slate-900/90 border border-slate-700/80 px-2.5 py-1 rounded-lg text-slate-100 transition">
                 <input type="checkbox" id="chk-include-vocab-slide" checked onchange="buildSlides()" class="accent-amber-400" />
-                <span>Kèm slide Từ vựng tiếng Anh</span>
+                <span>Kèm slide Từ vựng</span>
               </label>
-              <button onclick="toggleSlideFullscreen()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-600 px-3 py-1 rounded-lg font-bold transition">
+              <button onclick="toggleSlideFullscreen()" class="bg-slate-900/75 hover:bg-slate-800 text-amber-300 border border-amber-400/40 px-3 py-1 rounded-lg font-bold transition shadow-xs">
                 &#9974; Toàn màn hình
               </button>
             </div>
@@ -335,17 +406,20 @@
 
           <div id="slide-stage" class="my-5 space-y-4"></div>
 
-          <div class="flex flex-wrap items-center justify-between gap-2 pt-4 border-t border-slate-800">
-            <button onclick="prevSlide()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-xs font-bold">&larr; Slide trước</button>
-            <div class="flex items-center gap-2">
-              <button id="btn-toggle-slide-sol" onclick="toggleSlideSolution()" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold shadow">
-                &#128161; Hiện lời giải chi tiết
-              </button>
-              <button onclick="speakCurrentSlide()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5">
-                <span>&#128266;</span> Đọc tiếng Anh trên Slide
-              </button>
+          <div class="space-y-3 pt-3 border-t border-white/10">
+            <div id="slide-jump-pills" class="flex flex-wrap items-center justify-center gap-1.5"></div>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <button onclick="prevSlide()" class="bg-slate-800/90 hover:bg-slate-700 border border-slate-600/60 px-4 py-2 rounded-xl text-xs font-bold transition">&larr; Slide trước</button>
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="btn-toggle-slide-sol" onclick="toggleSlideSolution()" class="hidden bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow transition">
+                  &#128161; Hiện lời giải chi tiết
+                </button>
+                <button onclick="speakCurrentSlide()" class="bg-sky-500 hover:bg-sky-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow transition">
+                  <span>&#128266;</span> Đọc tiếng Anh
+                </button>
+              </div>
+              <button onclick="nextSlide()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow transition">Slide tiếp &rarr;</button>
             </div>
-            <button onclick="nextSlide()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2 rounded-lg text-xs font-bold">Slide tiếp &rarr;</button>
           </div>
         </div>
 
@@ -2904,10 +2978,28 @@ function toggleSlideFullscreen() {
   }
 }
 
+function jumpToSlide(idx) {
+  if (!slidesData.length) return;
+  currentSlideIdx = Math.max(0, Math.min(slidesData.length - 1, idx));
+  renderSlideStage();
+}
+
 function renderSlideStage() {
   const s = slidesData[currentSlideIdx] || slidesData[0];
   slideSolutionVisible = false;
   document.getElementById("slide-counter").textContent = `Slide ${currentSlideIdx + 1} / ${slidesData.length}`;
+  const prog = document.getElementById("slide-progress-bar");
+  if (prog && slidesData.length > 0) {
+    prog.style.width = `${Math.round(((currentSlideIdx + 1) / slidesData.length) * 100)}%`;
+  }
+  const jumpPills = document.getElementById("slide-jump-pills");
+  if (jumpPills && slidesData.length > 0) {
+    jumpPills.innerHTML = slidesData.map((_, i) => {
+      const active = i === currentSlideIdx;
+      return `<button type="button" onclick="jumpToSlide(${i})" title="Tới Slide ${i + 1}" class="w-6 h-6 rounded-full text-[11px] font-extrabold transition ${active ? 'bg-amber-400 text-slate-950 scale-110 shadow' : 'bg-white/10 hover:bg-white/25 text-slate-200'}">${i + 1}</button>`;
+    }).join("");
+  }
+
   const solBtn = document.getElementById("btn-toggle-slide-sol");
   if (solBtn) {
     if (s.solution && s.solution.trim() !== "") {
@@ -2919,16 +3011,24 @@ function renderSlideStage() {
   }
 
   const stageEl = document.getElementById("slide-stage");
+  stageEl.classList.remove("slide-anim-enter");
+  void stageEl.offsetWidth;
+  stageEl.classList.add("slide-anim-enter");
   stageEl.innerHTML = `
-    <span class="inline-block bg-amber-400 text-slate-950 text-xs font-extrabold px-3 py-1 rounded-full">${s.tag}</span>
-    <h3 class="text-2xl md:text-3xl font-extrabold text-white leading-snug">${s.title}</h3>
-    <p class="text-base md:text-lg text-amber-300 font-semibold italic">${s.subtitle}</p>
-    <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 md:p-5 text-sm md:text-base text-slate-100 leading-relaxed space-y-1.5">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 bg-amber-400/95 text-slate-950 text-xs font-extrabold px-3 py-1 rounded-full tracking-wide shadow-xs">&#10024; ${s.tag}</span>
+      <span class="text-xs text-sky-200/80 font-medium">Mục ${currentSlideIdx + 1} trên ${slidesData.length}</span>
+    </div>
+    <div class="space-y-1">
+      <h3 class="text-2xl md:text-3xl font-extrabold text-white leading-snug tracking-tight">${s.title}</h3>
+      <p class="text-sm md:text-base text-amber-300 font-semibold italic">${s.subtitle}</p>
+    </div>
+    <div class="slide-math-card rounded-2xl p-4 md:p-6 text-sm md:text-base text-slate-100 leading-relaxed space-y-2">
       ${s.body}
     </div>
     ${s.solution ? `
-      <div id="slide-solution-box" class="hidden bg-emerald-950/90 border-2 border-emerald-400 rounded-xl p-4 text-sm md:text-base text-emerald-100 leading-relaxed">
-        <div class="font-extrabold text-emerald-300 uppercase text-xs mb-1">&#10004; Lời giải &amp; Đáp án chi tiết:</div>
+      <div id="slide-solution-box" class="hidden bg-emerald-950/90 border-2 border-emerald-400/90 rounded-2xl p-4 md:p-5 text-sm md:text-base text-emerald-100 leading-relaxed shadow-md">
+        <div class="font-extrabold text-emerald-300 uppercase text-xs tracking-wider mb-1.5">&#10004; Lời giải &amp; Đáp án chi tiết</div>
         ${s.solution}
       </div>
     ` : ""}
@@ -2938,13 +3038,23 @@ function renderSlideStage() {
       delimiters: [
         { left: "$$", right: "$$", display: true },
         { left: "$", right: "$", display: false },
-        { left: "\\(", right: "\\)", display: false },
-        { left: "\\[", right: "\\]", display: true }
+        { left: "\(", right: "\)", display: false },
+        { left: "\[", right: "\]", display: true }
       ],
       throwOnError: false
     });
   }
 }
+
+document.addEventListener("keydown", (e) => {
+  const slidePanel = document.getElementById("panel-slides");
+  const isSlidesOpen = slidePanel && !slidePanel.classList.contains("hidden") && !document.getElementById("slide-deck-view")?.classList.contains("hidden");
+  if (!isSlidesOpen) return;
+  const tag = (e.target && e.target.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "textarea" || tag === "select") return;
+  if (e.key === "ArrowRight") { e.preventDefault(); nextSlide(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+});
 
 function prevSlide() {
   currentSlideIdx = (currentSlideIdx - 1 + slidesData.length) % slidesData.length;
@@ -5904,6 +6014,34 @@ function renderAssignmentTab() {
     `Cấu trúc đề: <strong>12 TN</strong> · <strong>2 Đ/S (8 ý)</strong> · <strong>4 TLN</strong> &nbsp;|&nbsp; Phân bố: <strong>30% NB</strong> (${nbCount}) · <strong>50% TH</strong> (${thCount}) · <strong>20% VD</strong> (${vdCount})`;
 
   const area = document.getElementById("exam-questions-area");
+  if (!document.getElementById("exam-anticheat-toolbar") && area && area.parentNode) {
+    const bar = document.createElement("div");
+    bar.id = "exam-anticheat-toolbar";
+    bar.className = "space-y-2 no-print";
+    bar.innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900 text-white rounded-xl px-4 py-3 border border-slate-700 shadow-xs">
+        <div class="flex items-center gap-2.5">
+          <span class="text-lg">&#9201;</span>
+          <div>
+            <div class="text-[11px] uppercase tracking-wider text-amber-300 font-bold">Thời gian làm bài (45 phút)</div>
+            <div id="exam-countdown-timer" class="text-lg md:text-xl font-mono font-extrabold text-amber-400">${formatCountdownMMSS(examRemainingSeconds)}</div>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span id="exam-violation-badge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300">Thoát màn: ${screenViolationCount}/${MAX_SCREEN_VIOLATIONS}</span>
+          <button id="btn-toggle-photo-shield" type="button" onclick="toggleScreenshotShield()" class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300 cursor-pointer">Chống chụp: BẬT</button>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-200 border border-slate-600">Thoát màn 2 lần &rarr; Tự nộp bài</span>
+        </div>
+      </div>
+      <div id="exam-anticheat-alert" class="${screenViolationCount > 0 && !examIsSubmitted ? '' : 'hidden'} bg-rose-50 border-2 border-rose-400 text-rose-950 rounded-xl px-4 py-2.5 text-xs md:text-sm font-semibold"></div>
+    `;
+    area.parentNode.insertBefore(bar, area);
+    startExamCountdownTimer();
+  } else {
+    updateAntiCheatStatusBar();
+  }
+  applyAntiScreenshotProtectionToArea();
+
   let html = "";
 
   // PART I: 12 MULTIPLE CHOICE
@@ -6043,7 +6181,200 @@ function normalizeShortAns(val) {
   return String(val || "").trim().replace(/\s+/g, "").replace(/,/g, ".").toLowerCase();
 }
 
-function submitAndGradeExam() {
+
+const EXAM_DURATION_SECONDS = 45 * 60;
+const MAX_SCREEN_VIOLATIONS = 2;
+let examRemainingSeconds = EXAM_DURATION_SECONDS;
+let examTimerInterval = null;
+let screenViolationCount = 0;
+let examIsSubmitted = false;
+let lastViolationTimestamp = 0;
+
+function formatCountdownMMSS(sec) {
+  const safe = Math.max(0, Number(sec) || 0);
+  const m = Math.floor(safe / 60);
+  const s = safe % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function updateAntiCheatStatusBar() {
+  const timerEl = document.getElementById("exam-countdown-timer");
+  const violEl = document.getElementById("exam-violation-badge");
+  const warnBox = document.getElementById("exam-anticheat-alert");
+  if (timerEl) {
+    timerEl.textContent = formatCountdownMMSS(examRemainingSeconds);
+    if (examRemainingSeconds <= 300) {
+      timerEl.className = "text-lg md:text-xl font-mono font-extrabold text-rose-600 animate-pulse";
+    } else {
+      timerEl.className = "text-lg md:text-xl font-mono font-extrabold text-amber-400";
+    }
+  }
+  if (violEl) {
+    violEl.textContent = `Thoát màn: ${screenViolationCount}/${MAX_SCREEN_VIOLATIONS}`;
+    violEl.className = screenViolationCount >= 1
+      ? "px-3 py-1 rounded-full text-xs font-extrabold bg-rose-100 text-rose-800 border border-rose-300"
+      : "px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300";
+  }
+  if (warnBox && screenViolationCount > 0 && !examIsSubmitted) {
+    warnBox.classList.remove("hidden");
+    warnBox.innerHTML = `&#9888;&#65039; <strong>CẢNH BÁO CHỐNG GIAN LẬN (${screenViolationCount}/${MAX_SCREEN_VIOLATIONS}):</strong> Hệ thống ghi nhận học sinh đã rời khỏi màn hình làm bài. Thoát màn hình đủ <strong>${MAX_SCREEN_VIOLATIONS} lần</strong> hệ thống sẽ <strong>tự động nộp bài</strong>!`;
+  }
+}
+
+function startExamCountdownTimer() {
+  if (examTimerInterval) clearInterval(examTimerInterval);
+  examTimerInterval = setInterval(() => {
+    if (examIsSubmitted) {
+      clearInterval(examTimerInterval);
+      return;
+    }
+    const assignPanel = document.getElementById("panel-assignment");
+    const isAssignVisible = assignPanel && !assignPanel.classList.contains("hidden");
+    if (!isAssignVisible && !isStudentMode) return;
+
+    examRemainingSeconds--;
+    updateAntiCheatStatusBar();
+    if (examRemainingSeconds <= 0) {
+      examRemainingSeconds = 0;
+      updateAntiCheatStatusBar();
+      clearInterval(examTimerInterval);
+      submitAndGradeExam(true, "Hết giờ làm bài 45 phút");
+    }
+  }, 1000);
+}
+
+function resetExamSessionTimerAndViolations() {
+  examRemainingSeconds = EXAM_DURATION_SECONDS;
+  screenViolationCount = 0;
+  examIsSubmitted = false;
+  lastViolationTimestamp = 0;
+  const warnBox = document.getElementById("exam-anticheat-alert");
+  if (warnBox) warnBox.classList.add("hidden");
+  updateAntiCheatStatusBar();
+  startExamCountdownTimer();
+}
+
+function recordScreenExitViolation() {
+  if (examIsSubmitted) return;
+  const assignPanel = document.getElementById("panel-assignment");
+  const isAssignVisible = assignPanel && !assignPanel.classList.contains("hidden");
+  if (!isAssignVisible && !isStudentMode) return;
+
+  const now = Date.now();
+  if (now - lastViolationTimestamp < 1200) return;
+  lastViolationTimestamp = now;
+
+  flashExamBlurShield(1400);
+  screenViolationCount++;
+  updateAntiCheatStatusBar();
+
+  if (screenViolationCount >= MAX_SCREEN_VIOLATIONS) {
+    submitAndGradeExam(true, `Thoát màn hình ${MAX_SCREEN_VIOLATIONS}/${MAX_SCREEN_VIOLATIONS} lần`);
+  } else {
+    showToast(`Cảnh báo lần ${screenViolationCount}/${MAX_SCREEN_VIOLATIONS}: Không rời khỏi màn hình làm bài! Thoát thêm 1 lần sẽ tự động nộp bài.`);
+  }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    recordScreenExitViolation();
+  }
+});
+
+window.addEventListener("blur", () => {
+  setTimeout(() => {
+    if (!document.hasFocus()) {
+      recordScreenExitViolation();
+    }
+  }, 150);
+});
+
+
+
+let screenshotShieldEnabled = true;
+let blurFlashTimeout = null;
+
+function isExamSessionActive() {
+  if (examIsSubmitted) return false;
+  const assignPanel = document.getElementById("panel-assignment");
+  const isAssignVisible = assignPanel && !assignPanel.classList.contains("hidden");
+  return Boolean(isAssignVisible || isStudentMode);
+}
+
+function flashExamBlurShield(durationMs = 1400) {
+  const area = document.getElementById("exam-questions-area");
+  if (!area || !screenshotShieldEnabled) return;
+  area.classList.add("exam-blur-active");
+  if (blurFlashTimeout) clearTimeout(blurFlashTimeout);
+  blurFlashTimeout = setTimeout(() => {
+    area.classList.remove("exam-blur-active");
+  }, durationMs);
+}
+
+function toggleScreenshotShield() {
+  screenshotShieldEnabled = !screenshotShieldEnabled;
+  const layer = document.getElementById("exam-anti-photo-watermark");
+  const btn = document.getElementById("btn-toggle-photo-shield");
+  const area = document.getElementById("exam-questions-area");
+  if (layer) layer.classList.toggle("hidden", !screenshotShieldEnabled);
+  if (!screenshotShieldEnabled && area) area.classList.remove("exam-blur-active");
+  if (btn) {
+    btn.textContent = screenshotShieldEnabled ? "Chống chụp: BẬT" : "Chống chụp: TẮT";
+    btn.className = screenshotShieldEnabled
+      ? "px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300 cursor-pointer"
+      : "px-2.5 py-1 rounded-full text-xs font-bold bg-slate-700 text-slate-300 border border-slate-500 cursor-pointer";
+  }
+  showToast(screenshotShieldEnabled ? "Đã bật lớp chống chụp màn hình & nhiễu chống chụp thiết bị khác!" : "Đã tắt lớp chống chụp màn hình.");
+}
+
+function applyAntiScreenshotProtectionToArea() {
+  const area = document.getElementById("exam-questions-area");
+  if (!area) return;
+  area.classList.add("exam-protected-area");
+  if (screenshotShieldEnabled && !document.getElementById("exam-anti-photo-watermark")) {
+    const wm = document.createElement("div");
+    wm.id = "exam-anti-photo-watermark";
+    wm.className = "anti-photo-grid-layer";
+    area.appendChild(wm);
+  }
+  if (!area.dataset.shieldBound) {
+    area.dataset.shieldBound = "1";
+    area.addEventListener("contextmenu", (e) => {
+      if (screenshotShieldEnabled && isExamSessionActive()) {
+        e.preventDefault();
+        flashExamBlurShield(900);
+        showToast("Chế độ chống gian lận đang bật: không sao chép/chuột phải trên đề thi!");
+      }
+    });
+    area.addEventListener("copy", (e) => {
+      if (screenshotShieldEnabled && isExamSessionActive()) {
+        e.preventDefault();
+        flashExamBlurShield(900);
+      }
+    });
+  }
+}
+
+window.addEventListener("keydown", (e) => {
+  if (!screenshotShieldEnabled || !isExamSessionActive()) return;
+  const isPrintScreen = e.key === "PrintScreen" || e.keyCode === 44;
+  const isSnipCombo = (e.ctrlKey || e.metaKey) && e.shiftKey && ["s", "i", "j", "c"].includes(String(e.key || "").toLowerCase());
+  if (isPrintScreen || isSnipCombo) {
+    flashExamBlurShield(1800);
+    recordScreenExitViolation();
+  }
+});
+
+window.addEventListener("keyup", (e) => {
+  if (!screenshotShieldEnabled || !isExamSessionActive()) return;
+  if (e.key === "PrintScreen" || e.keyCode === 44) {
+    flashExamBlurShield(1800);
+    recordScreenExitViolation();
+  }
+});
+
+
+function submitAndGradeExam(isAutoSubmit = false, autoReason = "") {
   const exam = getActiveExamForRender();
   const fullName = document.getElementById("stu-fullname").value.trim() || "Học sinh ẩn danh";
   const stuClass = document.getElementById("stu-class").value.trim() || "Chưa ghi lớp";
@@ -6115,7 +6446,11 @@ function submitAndGradeExam() {
 
   const resBox = document.getElementById("exam-grading-result");
   resBox.classList.remove("hidden");
+  const autoBannerNote = isAutoSubmit
+    ? `<div class="bg-rose-100 border border-rose-400 text-rose-950 text-xs md:text-sm font-extrabold px-3.5 py-2 rounded-xl">&#9888;&#65039; Bài làm đã được nộp tự động do: ${autoReason || "vi phạm thoát màn hình 2 lần / hết thời gian 45 phút"}.</div>`
+    : "";
   resBox.innerHTML = `
+    ${autoBannerNote}
     <div class="flex flex-wrap items-center justify-between gap-2">
       <div>
         <div class="text-xs font-extrabold uppercase text-emerald-800">KẾT QUẢ CHẤM TỰ ĐỘNG / AUTO-GRADED RESULT</div>
@@ -6133,13 +6468,18 @@ function submitAndGradeExam() {
     </div>
   `;
 
+  examIsSubmitted = true;
+  const qAreaEl = document.getElementById("exam-questions-area");
+  if (qAreaEl) qAreaEl.classList.remove("exam-blur-active");
+  if (examTimerInterval) clearInterval(examTimerInterval);
+  const autoTag = isAutoSubmit ? ` [Tự động nộp: ${autoReason || "Chống gian lận/Hết giờ"}]` : "";
   const subRecord = {
     name: fullName,
     stuClass,
     stuCode,
-    examTitle: `${exam.titleVi} [${activeVariantCode}]`,
+    examTitle: `${exam.titleVi} [${activeVariantCode}]${autoTag}`,
     score: totalScore,
-    detail: `TN ${mcCorrect}/12 · Đ/S ${tfSubCorrect}/${tfSubTotal} · TLN ${shortCorrect}/4`,
+    detail: `TN ${mcCorrect}/12 · Đ/S ${tfSubCorrect}/${tfSubTotal} · TLN ${shortCorrect}/4 · Thoát màn: ${screenViolationCount}/${MAX_SCREEN_VIOLATIONS}`,
     time: new Date().toLocaleString("vi-VN")
   };
   examState.submissions.unshift(subRecord);
@@ -6165,6 +6505,7 @@ function submitAndGradeExam() {
 
 function resetExamInputs() {
   document.getElementById("exam-grading-result").classList.add("hidden");
+  resetExamSessionTimerAndViolations();
   renderAssignmentTab();
 }
 
