@@ -90,17 +90,25 @@
     }
     .slide-stage-surface {
       background:
-        radial-gradient(circle at 12% 15%, rgba(245, 158, 11, 0.14), transparent 36%),
-        radial-gradient(circle at 88% 82%, rgba(56, 189, 248, 0.14), transparent 40%),
-        linear-gradient(145deg, #09132c 0%, #0f1f47 52%, #132554 100%);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      box-shadow: 0 20px 45px -12px rgba(2, 6, 23, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        radial-gradient(circle at 8% 12%, rgba(251, 191, 36, 0.28), transparent 38%),
+        radial-gradient(circle at 92% 18%, rgba(56, 189, 248, 0.24), transparent 42%),
+        radial-gradient(circle at 80% 90%, rgba(52, 211, 153, 0.22), transparent 40%),
+        linear-gradient(135deg, #f0f9ff 0%, #eff6ff 48%, #fefce8 100%);
+      border: 2px solid #bae6fd;
+      box-shadow: 0 18px 40px -14px rgba(30, 58, 138, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
     .slide-math-card {
-      background: rgba(15, 23, 42, 0.72);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(125, 211, 252, 0.22);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      border: 1.5px solid #bfdbfe;
+      border-left: 5px solid #2563eb;
+      box-shadow: 0 10px 24px -10px rgba(37, 99, 235, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+    .slide-solution-card {
+      background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+      border: 2px solid #34d399;
+      border-left: 6px solid #059669;
+      box-shadow: 0 10px 24px -10px rgba(5, 150, 105, 0.2);
     }
     .exam-protected-area {
       position: relative;
@@ -383,22 +391,22 @@
           </button>
         </div>
 
-        <div id="slide-deck-view" class="slide-stage-surface text-white rounded-2xl p-5 md:p-8 min-h-[480px] flex flex-col justify-between relative overflow-hidden">
-          <div class="w-full h-1.5 bg-slate-800/90 rounded-full overflow-hidden mb-4">
-            <div id="slide-progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-amber-300 to-sky-400 transition-all duration-300" style="width: 8%;"></div>
+        <div id="slide-deck-view" class="slide-stage-surface text-slate-900 rounded-2xl p-5 md:p-8 min-h-[480px] flex flex-col justify-between relative overflow-hidden">
+          <div class="w-full h-2 bg-sky-100 rounded-full overflow-hidden mb-4 border border-sky-200/80">
+            <div id="slide-progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-pink-400 to-sky-500 transition-all duration-300" style="width: 8%;"></div>
           </div>
 
-          <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-700">
             <div class="flex flex-wrap items-center gap-2">
-              <span id="slide-counter" class="bg-amber-400 text-slate-950 px-3 py-1 rounded-full font-extrabold shadow-xs">Slide 1 / 12</span>
-              <span id="slide-deck-badge" class="bg-sky-500/15 border border-sky-400/30 text-sky-200 px-3 py-1 rounded-full font-semibold">Bộ trình chiếu chuẩn SGK</span>
+              <span id="slide-counter" class="bg-gradient-to-r from-amber-400 to-orange-400 text-slate-950 px-3.5 py-1 rounded-full font-extrabold shadow-xs">Slide 1 / 12</span>
+              <span id="slide-deck-badge" class="bg-white/90 border border-sky-300 text-blue-900 px-3 py-1 rounded-full font-bold shadow-2xs">Bộ trình chiếu chuẩn SGK</span>
             </div>
-            <div class="flex flex-wrap items-center gap-3">
-              <label class="inline-flex items-center gap-1.5 cursor-pointer bg-slate-900/60 hover:bg-slate-900/90 border border-slate-700/80 px-2.5 py-1 rounded-lg text-slate-100 transition">
-                <input type="checkbox" id="chk-include-vocab-slide" checked onchange="buildSlides()" class="accent-amber-400" />
+            <div class="flex flex-wrap items-center gap-2.5">
+              <label class="inline-flex items-center gap-1.5 cursor-pointer bg-white/90 hover:bg-white border border-sky-200 px-3 py-1 rounded-xl text-slate-800 font-semibold transition shadow-2xs">
+                <input type="checkbox" id="chk-include-vocab-slide" checked onchange="buildSlides()" class="accent-blue-600" />
                 <span>Kèm slide Từ vựng</span>
               </label>
-              <button onclick="toggleSlideFullscreen()" class="bg-slate-900/75 hover:bg-slate-800 text-amber-300 border border-amber-400/40 px-3 py-1 rounded-lg font-bold transition shadow-xs">
+              <button onclick="toggleSlideFullscreen()" class="bg-white hover:bg-amber-50 text-blue-950 border border-amber-400 px-3 py-1 rounded-xl font-bold transition shadow-2xs">
                 &#9974; Toàn màn hình
               </button>
             </div>
@@ -406,19 +414,19 @@
 
           <div id="slide-stage" class="my-5 space-y-4"></div>
 
-          <div class="space-y-3 pt-3 border-t border-white/10">
+          <div class="space-y-3 pt-3 border-t border-sky-200/90">
             <div id="slide-jump-pills" class="flex flex-wrap items-center justify-center gap-1.5"></div>
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <button onclick="prevSlide()" class="bg-slate-800/90 hover:bg-slate-700 border border-slate-600/60 px-4 py-2 rounded-xl text-xs font-bold transition">&larr; Slide trước</button>
+              <button onclick="prevSlide()" class="bg-white hover:bg-sky-50 text-slate-800 border border-slate-300 px-4 py-2 rounded-xl text-xs font-extrabold transition shadow-2xs">&larr; Slide trước</button>
               <div class="flex flex-wrap items-center gap-2">
-                <button id="btn-toggle-slide-sol" onclick="toggleSlideSolution()" class="hidden bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow transition">
+                <button id="btn-toggle-slide-sol" onclick="toggleSlideSolution()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-extrabold shadow transition">
                   &#128161; Hiện lời giải chi tiết
                 </button>
-                <button onclick="speakCurrentSlide()" class="bg-sky-500 hover:bg-sky-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow transition">
+                <button onclick="speakCurrentSlide()" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow transition">
                   <span>&#128266;</span> Đọc tiếng Anh
                 </button>
               </div>
-              <button onclick="nextSlide()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow transition">Slide tiếp &rarr;</button>
+              <button onclick="nextSlide()" class="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold shadow transition">Slide tiếp &rarr;</button>
             </div>
           </div>
         </div>
@@ -2996,7 +3004,7 @@ function renderSlideStage() {
   if (jumpPills && slidesData.length > 0) {
     jumpPills.innerHTML = slidesData.map((_, i) => {
       const active = i === currentSlideIdx;
-      return `<button type="button" onclick="jumpToSlide(${i})" title="Tới Slide ${i + 1}" class="w-6 h-6 rounded-full text-[11px] font-extrabold transition ${active ? 'bg-amber-400 text-slate-950 scale-110 shadow' : 'bg-white/10 hover:bg-white/25 text-slate-200'}">${i + 1}</button>`;
+      return `<button type="button" onclick="jumpToSlide(${i})" title="Tới Slide ${i + 1}" class="w-6 h-6 rounded-full text-[11px] font-extrabold transition ${active ? 'bg-amber-400 text-slate-950 border border-amber-500 scale-110 shadow' : 'bg-white/85 hover:bg-sky-100 text-blue-900 border border-sky-200'}">${i + 1}</button>`;
     }).join("");
   }
 
@@ -3014,22 +3022,30 @@ function renderSlideStage() {
   stageEl.classList.remove("slide-anim-enter");
   void stageEl.offsetWidth;
   stageEl.classList.add("slide-anim-enter");
+  const brightBody = String(s.body || "")
+    .replace(/text-sky-300/g, "text-sky-700 font-semibold")
+    .replace(/text-sky-200/g, "text-blue-800");
+  const brightSol = String(s.solution || "")
+    .replace(/text-emerald-200/g, "text-teal-800");
+
   stageEl.innerHTML = `
-    <div class="flex flex-wrap items-center gap-2">
-      <span class="inline-flex items-center gap-1.5 bg-amber-400/95 text-slate-950 text-xs font-extrabold px-3 py-1 rounded-full tracking-wide shadow-xs">&#10024; ${s.tag}</span>
-      <span class="text-xs text-sky-200/80 font-medium">Mục ${currentSlideIdx + 1} trên ${slidesData.length}</span>
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-300 via-yellow-300 to-orange-300 text-blue-950 border border-amber-400/70 text-xs font-extrabold px-3.5 py-1 rounded-full tracking-wide shadow-2xs">&#10024; ${s.tag}</span>
+        <span class="text-xs bg-white/80 text-blue-900 border border-sky-200 px-2.5 py-0.5 rounded-full font-bold">Slide ${currentSlideIdx + 1} / ${slidesData.length}</span>
+      </div>
     </div>
-    <div class="space-y-1">
-      <h3 class="text-2xl md:text-3xl font-extrabold text-white leading-snug tracking-tight">${s.title}</h3>
-      <p class="text-sm md:text-base text-amber-300 font-semibold italic">${s.subtitle}</p>
+    <div class="space-y-1.5 bg-white/75 border border-white rounded-2xl px-4 py-3 shadow-2xs">
+      <h3 class="text-xl md:text-3xl font-extrabold bg-gradient-to-r from-blue-950 via-indigo-900 to-sky-800 bg-clip-text text-transparent leading-snug tracking-tight">${s.title}</h3>
+      <p class="text-sm md:text-base text-amber-700 font-bold italic">${s.subtitle}</p>
     </div>
-    <div class="slide-math-card rounded-2xl p-4 md:p-6 text-sm md:text-base text-slate-100 leading-relaxed space-y-2">
-      ${s.body}
+    <div class="slide-math-card rounded-2xl p-4 md:p-6 text-sm md:text-base text-slate-800 leading-relaxed space-y-2.5">
+      ${brightBody}
     </div>
     ${s.solution ? `
-      <div id="slide-solution-box" class="hidden bg-emerald-950/90 border-2 border-emerald-400/90 rounded-2xl p-4 md:p-5 text-sm md:text-base text-emerald-100 leading-relaxed shadow-md">
-        <div class="font-extrabold text-emerald-300 uppercase text-xs tracking-wider mb-1.5">&#10004; Lời giải &amp; Đáp án chi tiết</div>
-        ${s.solution}
+      <div id="slide-solution-box" class="hidden slide-solution-card rounded-2xl p-4 md:p-5 text-sm md:text-base text-emerald-950 leading-relaxed">
+        <div class="font-extrabold text-emerald-700 uppercase text-xs tracking-wider mb-1.5">&#10004; Lời giải &amp; Đáp án chi tiết</div>
+        ${brightSol}
       </div>
     ` : ""}
   `;
