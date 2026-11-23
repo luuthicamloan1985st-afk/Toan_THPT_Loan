@@ -4410,7 +4410,23 @@ function escapeForExportedHtmlScript(str) {
 
 function exportSlidesHTML() {
   const lesson = getLesson();
-  const safeSlidesJson = JSON.stringify(slidesData)
+  const renderedSlides = slidesData.map(s => {
+    let bodyHtml = String(s.body || "")
+      .replace(/text-sky-300/g, "color:#0369a1;font-weight:600")
+      .replace(/text-sky-200/g, "color:#1e40af");
+    let solHtml = String(s.solution || "")
+      .replace(/text-emerald-200/g, "color:#0f766e");
+    if (typeof katex !== "undefined") {
+      bodyHtml = bodyHtml
+        .replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => katex.renderToString(tex, { displayMode: true, throwOnError: false }))
+        .replace(/\$([^$]+?)\$/g, (_, tex) => katex.renderToString(tex, { displayMode: false, throwOnError: false }));
+      solHtml = solHtml
+        .replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => katex.renderToString(tex, { displayMode: true, throwOnError: false }))
+        .replace(/\$([^$]+?)\$/g, (_, tex) => katex.renderToString(tex, { displayMode: false, throwOnError: false }));
+    }
+    return { ...s, body: bodyHtml, solution: solHtml };
+  });
+  const safeSlidesJson = JSON.stringify(renderedSlides)
     .replace(/</g, "\\u003c")
     .replace(/>/g, "\\u003e");
   const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Trình chiếu: ${escapeForExportedHtmlScript(lesson.titleVi)}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"/><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"><\/script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"><\/script><style>
@@ -4433,20 +4449,16 @@ function exportSlidesHTML() {
     const SLIDES = ${safeSlidesJson};
     const root = document.getElementById("slides-root");
     root.innerHTML = SLIDES.map((s, i) => {
-      const cleanBody = String(s.body || "").replace(/text-sky-300/g,"color:#0369a1;font-weight:600").replace(/text-sky-200/g,"color:#1e40af");
-      const cleanSol = String(s.solution || "").replace(/text-emerald-200/g,"color:#0f766e");
-      return '<div class="slide"><span class="tag">Slide ' + (i+1) + ' / ' + SLIDES.length + ' · ' + s.tag + '</span><h2>' + s.title + '</h2><p class="sub">' + s.subtitle + '</p><div class="body-box">' + cleanBody + '</div>' + (cleanSol ? '<button class="sec" style="margin-top:12px" onclick="toggleSol(' + i + ')">Lời giải chi tiết</button><div id="sol-' + i + '" class="sol-box">' + cleanSol + '</div>' : '') + '</div>';
+      return '<div class="slide"><span class="tag">Slide ' + (i+1) + ' / ' + SLIDES.length + ' · ' + s.tag + '</span><h2>' + s.title + '</h2><p class="sub">' + s.subtitle + '</p><div class="body-box">' + s.body + '</div>' + (s.solution ? '<button class="sec" style="margin-top:12px" onclick="toggleSol(' + i + ')">Lời giải chi tiết</button><div id="sol-' + i + '" class="sol-box">' + s.solution + '</div>' : '') + '</div>';
     }).join("");
     function toggleSol(i){ const el=document.getElementById("sol-"+i); if(el) el.classList.toggle("show"); }
     function toggleAllSols(){ document.querySelectorAll(".sol-box").forEach(el=>el.classList.toggle("show")); }
-    window.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("load", () => {
       if (typeof renderMathInElement === "function") {
         renderMathInElement(document.body, {
           delimiters: [
             { left: "$$", right: "$$", display: true },
-            { left: "$", right: "$", display: false },
-            { left: "\\(", right: "\\)", display: false },
-            { left: "\\[", right: "\\]", display: true }
+            { left: "$", right: "$", display: false }
           ],
           throwOnError: false
         });
