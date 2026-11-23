@@ -4408,28 +4408,43 @@ function escapeForExportedHtmlScript(str) {
     .replace(/\$\{/g, "\\${");
 }
 
+function renderSlideMathString(rawHtml) {
+  let out = String(rawHtml || "");
+  if (typeof katex !== "undefined") {
+    out = out
+      .replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => {
+        try { return katex.renderToString(tex, { displayMode: true, throwOnError: false }); }
+        catch (_) { return texToPlainWordMath(tex); }
+      })
+      .replace(/\$([^$]+?)\$/g, (_, tex) => {
+        try { return katex.renderToString(tex, { displayMode: false, throwOnError: false }); }
+        catch (_) { return texToPlainWordMath(tex); }
+      });
+  }
+  out = out
+    .replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => texToPlainWordMath(tex))
+    .replace(/\$([^$]+?)\$/g, (_, tex) => texToPlainWordMath(tex));
+  return out;
+}
+
 function exportSlidesHTML() {
   const lesson = getLesson();
   const renderedSlides = slidesData.map(s => {
-    let bodyHtml = String(s.body || "")
-      .replace(/text-sky-300/g, "color:#0369a1;font-weight:600")
-      .replace(/text-sky-200/g, "color:#1e40af");
-    let solHtml = String(s.solution || "")
-      .replace(/text-emerald-200/g, "color:#0f766e");
-    if (typeof katex !== "undefined") {
-      bodyHtml = bodyHtml
-        .replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => katex.renderToString(tex, { displayMode: true, throwOnError: false }))
-        .replace(/\$([^$]+?)\$/g, (_, tex) => katex.renderToString(tex, { displayMode: false, throwOnError: false }));
-      solHtml = solHtml
-        .replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => katex.renderToString(tex, { displayMode: true, throwOnError: false }))
-        .replace(/\$([^$]+?)\$/g, (_, tex) => katex.renderToString(tex, { displayMode: false, throwOnError: false }));
-    }
+    const bodyHtml = renderSlideMathString(
+      String(s.body || "")
+        .replace(/text-sky-300/g, "color:#0369a1;font-weight:600")
+        .replace(/text-sky-200/g, "color:#1e40af")
+    );
+    const solHtml = renderSlideMathString(
+      String(s.solution || "")
+        .replace(/text-emerald-200/g, "color:#0f766e")
+    );
     return { ...s, body: bodyHtml, solution: solHtml };
   });
   const safeSlidesJson = JSON.stringify(renderedSlides)
     .replace(/</g, "\\u003c")
     .replace(/>/g, "\\u003e");
-  const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Trình chiếu: ${escapeForExportedHtmlScript(lesson.titleVi)}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"/><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"><\/script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"><\/script><style>
+  const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Trình chiếu: ${escapeForExportedHtmlScript(lesson.titleVi)}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"/><style>
     body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(135deg,#f0f9ff 0%,#eff6ff 50%,#fefce8 100%);color:#0f172a;padding:28px 16px;margin:0}
     .wrap{max-width:960px;margin:0 auto}
     .top-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;background:#fff;border:1.5px solid #bae6fd;border-radius:16px;padding:16px 20px;margin-bottom:20px;box-shadow:0 8px 24px -10px rgba(30,58,138,0.15)}
@@ -4453,17 +4468,6 @@ function exportSlidesHTML() {
     }).join("");
     function toggleSol(i){ const el=document.getElementById("sol-"+i); if(el) el.classList.toggle("show"); }
     function toggleAllSols(){ document.querySelectorAll(".sol-box").forEach(el=>el.classList.toggle("show")); }
-    window.addEventListener("load", () => {
-      if (typeof renderMathInElement === "function") {
-        renderMathInElement(document.body, {
-          delimiters: [
-            { left: "$$", right: "$$", display: true },
-            { left: "$", right: "$", display: false }
-          ],
-          throwOnError: false
-        });
-      }
-    });
   <\/script></body></html>`;
   downloadTextFile(`${lesson.id}-trinh-chieu.html`, html, "text/html");
 }
